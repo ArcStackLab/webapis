@@ -1,0 +1,7 @@
+{
+  "name": "@arcstack/webapis",
+  "version": "0.1.0",
+  "exports": {
+    "main": "./libs/index.ts"
+  }
+}

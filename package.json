@@ -1,0 +1,35 @@
+{
+  "name": "@arcstack/webapis",
+  "version": "0.1.0",
+  "private": "true",
+  "displayName": "WebApis",
+  "namespace": "@arcstack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArcStackLab/webapis.git"
+  },
+  "packageManager": "pnpm@9.2.0",
+  "description": "A Comprehensive Integration of All Web Standard APIs",
+  "scripts": {
+    "lint:scripts": "eslint . --ext .ts",
+    "format:scripts": "prettier . --write",
+    "prepare": "husky",
+    "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7",
+    "typescript": "^5.5.4"
+  },
+  "keywords": [
+    "web",
+    "browser",
+    "api"
+  ],
+  "author": {
+    "name": "Odunayo Mohammed",
+    "email": "factman60@gmail.com",
+    "url": "https://github.com/factman"
+  },
+  "license": "MIT"
+}
