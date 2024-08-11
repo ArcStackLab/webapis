@@ -16,14 +16,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "pnpm dlx lerna version && git add .",
       "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "*": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix --ext .js,.jsx,.ts,.tsx"
     ]
   },
   "devDependencies": {

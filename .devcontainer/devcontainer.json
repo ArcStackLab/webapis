@@ -51,7 +51,8 @@
   },
   "portsAttributes": {
     "5173": {
-      "label": "app"
+      "label": "app",
+      "onAutoForward": "notify"
     }
   }
 }
