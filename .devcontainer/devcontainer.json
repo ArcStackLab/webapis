@@ -1,0 +1,58 @@
+{
+  "name": "WebApis",
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "18",
+      "nvmVersion": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "christian-kohler.path-intellisense",
+        "christian-kohler.npm-intellisense",
+        "redhat.vscode-yaml",
+        "aaron-bond.better-comments",
+        "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "mikestead.dotenv",
+        "wix.vscode-import-cost",
+        "streetsidesoftware.code-spell-checker",
+        "davidanson.vscode-markdownlint",
+        "nrwl.angular-console",
+        "stringham.move-ts",
+        "pmneo.tsimporter",
+        "wallabyjs.quokka-vscode",
+        "wallabyjs.console-ninja",
+        "antfu.vite",
+        "mhutchie.git-graph",
+        "shardulm94.trailing-spaces",
+        "usernamehw.errorlens",
+        "yzhang.markdown-all-in-one",
+        "vivaxy.vscode-conventional-commits",
+        "wayou.vscode-todo-highlight",
+        "gruntfuggly.todo-tree",
+        "folke.vscode-monorepo-workspace",
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "haydenbleasel.vercel-vscode",
+        "steoates.autoimport",
+        "yoavbls.pretty-ts-errors",
+        "bradlc.vscode-tailwindcss",
+        "pranaygp.vscode-css-peek",
+        "codezombiech.gitignore",
+        "github.vscode-github-actions"
+      ]
+    }
+  },
+  "portsAttributes": {
+    "5173": {
+      "label": "app",
+      "onAutoForward": "notify"
+    }
+  }
+}
