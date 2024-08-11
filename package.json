@@ -1,9 +1,8 @@
 {
-  "name": "@arcstack/webapis",
-  "version": "0.1.0",
+  "name": "webapis",
   "private": "true",
-  "displayName": "WebApis",
   "namespace": "@arcstack",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/ArcStackLab/webapis.git"
@@ -11,25 +10,37 @@
   "packageManager": "pnpm@9.2.0",
   "description": "A Comprehensive Integration of All Web Standard APIs",
   "scripts": {
-    "lint:scripts": "eslint . --ext .ts",
-    "format:scripts": "prettier . --write",
-    "prepare": "husky",
+    "lint": "prettier . --check && eslint",
+    "format": "prettier . --write",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "pnpm dlx lerna version && git add .",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
+    "eslint": "^9.8.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.7",
-    "typescript": "^5.5.4"
+    "prettier": "^3.3.3",
+    "typescript": "^5.2.2",
+    "nx": "19.5.7",
+    "@nx/eslint": "19.5.7"
   },
   "keywords": [
     "web",
     "browser",
     "api"
   ],
-  "author": {
-    "name": "Odunayo Mohammed",
-    "email": "factman60@gmail.com",
-    "url": "https://github.com/factman"
-  },
-  "license": "MIT"
+  "author": "factman",
+  "license": "MIT",
+  "dependencies": {}
 }

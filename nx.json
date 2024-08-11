@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ],
+  "nxCloudAccessToken": "OGM4ZTY1ZDItNTNhNi00YmU0LWI1MTUtNmRiNGVmYzg5MzZkfHJlYWQtd3JpdGU="
+}

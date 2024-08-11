@@ -1,0 +1,4 @@
+.vscode
+.pnpm-store
+.nx
+pnpm-*.yaml

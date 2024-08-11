@@ -4,8 +4,16 @@
   "editor.formatOnSave": true,
   "files.autoSaveWhenNoErrors": true,
   "files.autoSaveWorkspaceFilesOnly": true,
-  "git.branchProtection": ["main"],
+  "git.branchProtection": [
+    "main"
+  ],
   "npm.packageManager": "pnpm",
   "tailwindCSS.emmetCompletions": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "CodeGPT.apiKey": "CodeGPT Plus Beta",
+  "cSpell.words": [
+    "arcstack",
+    "factman",
+    "webapis"
+  ]
 }
