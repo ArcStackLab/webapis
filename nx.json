@@ -1,6 +1,18 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "^build",
+        "lint"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    }
+  },
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
@@ -9,5 +21,6 @@
       }
     }
   ],
-  "nxCloudAccessToken": "OGM4ZTY1ZDItNTNhNi00YmU0LWI1MTUtNmRiNGVmYzg5MzZkfHJlYWQtd3JpdGU="
+  "nxCloudId": "66b806726340ec37c5b8ec1b",
+  "nxCloudAccessToken": "MmNiOTc0NDQtZDNhZS00Njg1LWE4M2EtMjUxNTQzNzNiOTU1fHJlYWQ="
 }

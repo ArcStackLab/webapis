@@ -1,8 +1,10 @@
 {
-  "name": "webapis",
-  "private": "true",
+  "name": "@arcstack/webapis",
+  "version": "0.0.1",
   "namespace": "@arcstack",
   "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ArcStackLab/webapis.git"
@@ -10,7 +12,9 @@
   "packageManager": "pnpm@9.2.0",
   "description": "A Comprehensive Integration of All Web Standard APIs",
   "scripts": {
-    "lint": "prettier . --check && eslint",
+    "prebuild": "pnpx run-many -t build",
+    "build": "tsup",
+    "lint": "prettier . --check && eslint && tsc",
     "format": "prettier . --write",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
   },
@@ -24,18 +28,39 @@
       "eslint --fix --ext .js,.jsx,.ts,.tsx"
     ]
   },
+  "entry": {
+    ".": "./dist/index.js",
+    "PermissionsAPI": "./dist/PermissionsAPI.js"
+  },
+  "tsup": {
+    "entry": {
+      "index": "./index.ts",
+      "PermissionsAPI": "./packages/permissions/index.ts"
+    },
+    "splitting": false,
+    "sourcemap": true,
+    "dts": true,
+    "clean": true,
+    "platform": "browser",
+    "format": [
+      "esm"
+    ]
+  },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "@nx/eslint": "19.5.7",
-    "esbuild": "0.23.0",
-    "eslint": "^9.9.0",
+    "@eslint/js": "^9.9.1",
+    "@nx/eslint": "19.8.0",
+    "@nx/eslint-plugin": "^19.8.0",
+    "esbuild": "^0.23.1",
+    "eslint": "^9.9.1",
     "globals": "^15.9.0",
-    "husky": "^9.1.4",
-    "lint-staged": "^15.2.7",
-    "nx": "19.5.7",
+    "husky": "^9.1.5",
+    "lint-staged": "^15.2.10",
+    "nx": "19.8.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.2.2",
-    "typescript-eslint": "^8.0.1"
+    "tslib": "^2.7.0",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.4.0"
   },
   "keywords": [
     "web",
