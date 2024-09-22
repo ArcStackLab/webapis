@@ -1,0 +1,29 @@
+{
+  "name": "@arcstack/permissions",
+  "version": "0.0.1",
+  "private": "true",
+  "description": "The Permissions API provides a consistent programmatic way to query the status of API permissions attributed to the current context.",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc"
+  },
+  "module": "./dist/PermissionsAPI.js",
+  "types": "./dist/PermissionsAPI.d.ts",
+  "tsup": {
+    "entry": {
+      "PermissionsAPI": "./index.ts"
+    },
+    "splitting": false,
+    "sourcemap": true,
+    "dts": true,
+    "clean": true,
+    "platform": "browser",
+    "format": [
+      "esm"
+    ]
+  },
+  "author": "factman",
+  "type": "module",
+  "license": "MIT"
+}
