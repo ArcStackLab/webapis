@@ -2,25 +2,26 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
+    "importHelpers": false,
+    "declaration": true,
     "isolatedDeclarations": true,
-    "target": "es2015",
-    "module": "esnext",
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "target": "ES2020",
+    "module": "ES6",
     "lib": [
-      "es2020",
-      "dom"
+      "ES2020",
+      "DOM"
     ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@arcstack/*": [
-        "packages/**/src/index.ts"
+        "packages/*.ts"
       ]
     }
   },
