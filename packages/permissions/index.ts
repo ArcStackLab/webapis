@@ -1,7 +1,15 @@
 /**
- * `@arcstack/webapis` Implementation of standard WebApis according to MDN specifications
+ * `@arcstack/permissions` This Permissions API provides a consistent programmatic way to request the status of API permissions attributed to the current context.
  *
- * @module WebApis
+ * @module PermissionsAPI
  */
-export * from './src/PermissionsAPI'
-export type * from './src/types'
+export { PermissionsAPI } from './src/PermissionsAPI'
+export type {
+  PERMISSION_NAMES,
+  PermissionOption,
+  PermissionResponse,
+  PermissionHandlerOption,
+  IPermissionHandler,
+  AsyncPermissionResponse,
+  IAsyncPermissionHandler
+} from './src/types'
