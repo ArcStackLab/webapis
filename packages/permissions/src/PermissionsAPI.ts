@@ -222,9 +222,7 @@ export class PermissionsAPI {
    *  console.error('Error fetching permission status:', error)
    *}
    */
-  static async getPermission(
-    option: PermissionOption
-  ): Promise<PermissionResponse> {
+  static getPermission(option: PermissionOption): Promise<PermissionResponse> {
     return new Promise(async (resolve, reject) => {
       try {
         const _status = await PermissionsAPI.#permissions.query(option as any)
