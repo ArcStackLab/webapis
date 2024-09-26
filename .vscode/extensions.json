@@ -34,6 +34,7 @@
     "bradlc.vscode-tailwindcss",
     "pranaygp.vscode-css-peek",
     "codezombiech.gitignore",
-    "github.vscode-github-actions"
+    "github.vscode-github-actions",
+    "ms-playwright.playwright"
   ]
 }

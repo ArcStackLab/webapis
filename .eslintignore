@@ -1,6 +1,0 @@
-.vscode
-.pnpm-store
-.nx
-pnpm-*.yaml
-
-node_modules

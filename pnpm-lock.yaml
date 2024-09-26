@@ -8,8 +8,11 @@ importers:
 
   .:
     devDependencies:
+      '@eslint/eslintrc':
+        specifier: ^3.1.0
+        version: 3.1.0
       '@eslint/js':
-        specifier: ^9.9.1
+        specifier: ^9.11.0
         version: 9.11.0
       '@nx/eslint':
         specifier: 19.8.0
@@ -3686,6 +3689,21 @@ snapshots:
       - typescript
       - verdaccio
 
+  '@nrwl/js@19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.4.5)':
+    dependencies:
+      '@nx/js': 19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.4.5)
+    transitivePeerDependencies:
+      - '@babel/traverse'
+      - '@swc-node/register'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - debug
+      - nx
+      - supports-color
+      - typescript
+      - verdaccio
+
   '@nrwl/js@19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.6.2)':
     dependencies:
       '@nx/js': 19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.6.2)
@@ -3790,7 +3808,7 @@ snapshots:
       '@babel/preset-env': 7.25.4(@babel/core@7.25.2)
       '@babel/preset-typescript': 7.24.7(@babel/core@7.25.2)
       '@babel/runtime': 7.25.6
-      '@nrwl/js': 19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.6.2)
+      '@nrwl/js': 19.8.0(@babel/traverse@7.25.6)(@types/node@22.5.5)(nx@19.8.0)(typescript@5.4.5)
       '@nx/devkit': 19.8.0(nx@19.8.0)
       '@nx/workspace': 19.8.0
       babel-plugin-const-enum: 1.2.0(@babel/core@7.25.2)

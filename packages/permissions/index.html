@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Permissions</title>
+</head>
+
+<body>
+  <script type="module">
+    import { PermissionsAPI, PermissionOption } from './dist/permissions.js'
+
+    /**
+     * @param {PermissionOption} params
+     */
+    async function permission(params) {
+      const perm = await PermissionsAPI.getPermission(params)
+      console.log(perm)
+    }
+
+    permission({ name: 'geolocation' })
+  </script>
+</body>
+
+</html>

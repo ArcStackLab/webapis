@@ -14,8 +14,7 @@
   "scripts": {
     "prebuild": "pnpx run-many -t build",
     "build": "tsup",
-    "lint": "prettier . --check && eslint && tsc",
-    "format": "prettier . --write",
+    "lint": "eslint **/* && tsc",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
   },
   "husky": {
@@ -30,12 +29,12 @@
   },
   "entry": {
     ".": "./dist/index.js",
-    "PermissionsAPI": "./dist/PermissionsAPI.js"
+    "permissions": "./dist/permissions.js"
   },
   "tsup": {
     "entry": {
       "index": "./index.ts",
-      "PermissionsAPI": "./packages/permissions/index.ts"
+      "permissions": "./packages/permissions/index.ts"
     },
     "splitting": false,
     "sourcemap": true,
@@ -47,7 +46,8 @@
     ]
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.1",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.11.0",
     "@nx/eslint": "19.8.0",
     "@nx/eslint-plugin": "^19.8.0",
     "esbuild": "^0.23.1",
