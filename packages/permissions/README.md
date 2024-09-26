@@ -4,183 +4,35 @@
 
 The `@arcstack/permissions` package provides a consistent and programmatic way to manage API permissions in web applications. It allows developers to check the status of various permissions (like geolocation, notifications, etc.) and handle user interactions regarding these permissions seamlessly.
 
-## Table of Contents
+## Supported Permissions
 
-- [@arcstack/permissions](#arcstackpermissions)
-  - [Overview](#overview)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Importing the API](#importing-the-api)
-    - [Getting Permission Status](#getting-permission-status)
-    - [Creating Permission Handlers](#creating-permission-handlers)
-      - [Synchronous Permission Handler](#synchronous-permission-handler)
-      - [Asynchronous Permission Handler](#asynchronous-permission-handler)
-  - [API Reference](#api-reference)
-    - [PermissionsAPI Class](#permissionsapi-class)
-      - [Methods](#methods)
-    - [Permission Types](#permission-types)
-  - [Examples](#examples)
-    - [Example 1: Checking Geolocation Permission](#example-1-checking-geolocation-permission)
-    - [Example 2: Using Notification Permission Handler](#example-2-using-notification-permission-handler)
-  - [Contributing](#contributing)
-  - [License](#license)
+The following permissions are supported by the `@arcstack/permissions` package:
 
-## Installation
-
-To install the package, use npm or yarn:
-
-```bash
-npm install @arcstack/permissions
-```
-
-or
-
-```bash
-yarn add @arcstack/permissions
-```
-
-## Usage
-
-### Importing the API
-
-You can import the `PermissionsAPI` from the package as follows:
-
-```typescript
-import { PermissionsAPI } from '@arcstack/permissions'
-```
-
-### Getting Permission Status
-
-To get the permission status for a specific API, use the `getPermission` method:
-
-```typescript
-async function checkGeolocationPermission() {
-  try {
-    const permission = await PermissionsAPI.getPermission({
-      name: 'geolocation'
-    })
-    console.log('Permission state:', permission.state)
-  } catch (error) {
-    console.error('Error fetching permission status:', error)
-  }
-}
-```
-
-### Creating Permission Handlers
-
-You can create permission handlers for synchronous and asynchronous requests using the `getPermissionHandler` and `getAsyncPermissionHandler` methods, respectively.
-
-#### Synchronous Permission Handler
-
-```typescript
-const notificationHandler = PermissionsAPI.getPermissionHandler(
-  { name: 'notifications' },
-  {
-    granted: (permission) => {
-      console.log('Permission granted:', permission)
-    },
-    denied: (permission) => {
-      console.log('Permission denied:', permission)
-    },
-    error: (error) => {
-      console.error('Permission error:', error)
-    }
-  }
-)
-// Initiate the handler by calling the handler function
-notificationHandler()
-```
-
-#### Asynchronous Permission Handler
-
-```typescript
-const asyncCameraHandler = PermissionsAPI.getAsyncPermissionHandler({
-  name: 'camera'
-})
-asyncCameraHandler()
-  .then(({ granted, denied }) => {
-    if (granted) {
-      console.log('Permission granted:', granted)
-    } else {
-      console.log('Permission denied:', denied)
-    }
-  })
-  .catch((error) => {
-    console.error('Async permission error:', error)
-  })
-```
-
-## API Reference
-
-### PermissionsAPI Class
-
-The `PermissionsAPI` class provides methods to manage permissions.
-
-#### Methods
-
-- **`static async getPermission(option: PermissionOption): Promise<PermissionResponse>`**
-
-  - Gets the permission status for any valid permission name provided in the option object.
-
-- **`static getPermissionHandler(permissionOption: PermissionOption, handlerOption?: PermissionHandlerOption): IPermissionHandler`**
-
-  - Creates a permission handler for synchronous permission requests.
-
-- **`static getAsyncPermissionHandler(permissionOption: PermissionOption): IAsyncPermissionHandler`**
-  - Creates a permission handler for asynchronous permission requests.
-
-### Permission Types
-
-The following types are used in the API:
-
-- **`PermissionOption`**: Defines the options for requesting permissions.
-- **`PermissionResponse`**: Represents the response for a permission request, which can vary based on the permission state.
-- **`PermissionHandlerOption`**: Options for handling permission requests across all permission states.
-
-## Examples
-
-### Example 1: Checking Geolocation Permission
-
-```typescript
-async function checkGeolocationPermission() {
-  try {
-    const permission = await PermissionsAPI.getPermission({
-      name: 'geolocation'
-    })
-    if (permission.state === 'denied') {
-      console.log('Geolocation permission denied.')
-    } else {
-      console.log(
-        'Geolocation permission granted or will prompt the user for access.'
-      )
-    }
-  } catch (error) {
-    console.error('Error fetching permission status:', error)
-  }
-}
-```
-
-### Example 2: Using Notification Permission Handler
-
-```typescript
-const notificationHandler = PermissionsAPI.getPermissionHandler(
-  { name: 'notifications' },
-  {
-    granted: (permission) => {
-      console.log('Notification permission granted:', permission)
-    },
-    denied: (permission) => {
-      console.log('Notification permission denied:', permission)
-    },
-    error: (error) => {
-      console.error('Notification permission error:', error)
-    }
-  }
-)
-// Initiate the handler
-notificationHandler()
-```
+| Permission Name            | Description                                                                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `background-sync`          | Enables your application to synchronize data in the background, ensuring that updates are made even when the app is not actively in use.                |
+| `compute-pressure`         | Provides information about the current compute pressure on the device, allowing applications to optimize performance based on available resources.      |
+| `geolocation`              | Grants access to the user's location, enabling features that rely on geographical data, such as mapping and location-based services.                    |
+| `local-fonts`              | Allows your application to access and use fonts that are installed locally on the user's device, enhancing the visual presentation of text.             |
+| `microphone`               | Grants access to the user's microphone, enabling audio input for applications such as voice recognition and communication tools.                        |
+| `camera`                   | Allows your application to access the user's camera, enabling features like video conferencing, photography, and augmented reality experiences.         |
+| `notifications`            | Enables your application to send notifications to the user, keeping them informed about important updates and events even when the app is not in focus. |
+| `payment-handler`          | Allows your application to handle payment requests, facilitating seamless transactions and interactions with payment systems.                           |
+| `push`                     | Grants permission to send push notifications to the user, allowing for timely updates and alerts from your application.                                 |
+| `screen-wake-lock`         | Prevents the device's screen from dimming or locking, ensuring that your application remains visible during critical tasks.                             |
+| `accelerometer`            | Provides access to the device's accelerometer data, enabling features that respond to changes in orientation and movement.                              |
+| `gyroscope`                | Grants access to the device's gyroscope data, allowing applications to detect rotation and orientation changes for enhanced user experiences.           |
+| `magnetometer`             | Provides access to the device's magnetometer, enabling applications to determine the direction relative to the Earth's magnetic field.                  |
+| `ambient-light-sensor`     | Allows access to the device's ambient light sensor, enabling applications to adjust brightness and improve user comfort based on lighting conditions.   |
+| `storage-access`           | Grants access to the storage API, allowing applications to read and write data to the user's device storage.                                            |
+| `top-level-storage-access` | Allows applications to access top-level storage, enabling more efficient data management and retrieval.                                                 |
+| `persistent-storage`       | Grants access to persistent storage, ensuring that data remains available even after the application is closed.                                         |
+| `midi`                     | Allows access to MIDI devices, enabling music applications to interact with musical instruments and controllers.                                        |
+| `window-management`        | Grants permission to manage browser windows, allowing applications to create, close, and manipulate windows as needed.                                  |
+| `accessibility-events`     | Provides access to accessibility events, enabling applications to respond to changes in user accessibility settings.                                    |
+| `bluetooth`                | Grants access to Bluetooth devices, allowing applications to connect and communicate with nearby Bluetooth-enabled devices.                             |
+| `clipboard-read`           | Allows your application to read data from the clipboard, enabling features like pasting text and images.                                                |
+| `clipboard-write`          | Grants permission to write data to the clipboard, allowing users to copy text and images from your application.                                         |
 
 ## Contributing
 

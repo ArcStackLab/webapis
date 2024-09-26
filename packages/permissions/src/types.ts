@@ -66,13 +66,8 @@ export type PermissionOption =
  * Represents the state when the user or the user agent has given express permission,
  * or requires a prompt to approve the use of a feature.
  */
-type PermissionGranted = {
+type PermissionGranted = PermissionStatus & {
   state: 'granted' | 'prompt'
-  /**
-   * Provides the state of a permission and an event handler for monitoring changes.
-   */
-  status: PermissionStatus
-  name: string
 }
 
 /**
@@ -89,25 +84,14 @@ type PermissionError = {
  * Represents the state when the user or the user agent has denied access
  * to the requested feature.
  */
-type PermissionDenied = {
+type PermissionDenied = PermissionStatus & {
   state: 'denied'
-  /**
-   * Provides the state of a permission and an event handler for monitoring changes.
-   */
-  status: PermissionStatus
-  name: string
 }
 
 /**
  * Represents the state and status of a permission request.
  */
-type PermissionState = {
-  state: 'granted' | 'prompt' | 'denied'
-  /**
-   * Provides the state of a permission and an event handler for monitoring changes.
-   */
-  status: PermissionStatus
-  name: string
+type PermissionState = PermissionStatus & {
   message?: string
 }
 
@@ -156,16 +140,13 @@ export type PermissionHandlerOption = {
 }
 
 /**
- * Logs events related to permission changes.
- * Each event is identified by a unique event ID.
+ * Permission handler events
  */
-export type EventsLogs = {
-  [eventId: string]: {
-    onPermissionChange?: (response: PermissionResponse) => void
-    onPermissionGranted?: (response: PermissionResponse<'granted'>) => void
-    onPermissionDenied?: (response: PermissionResponse<'denied'>) => void
-    onPermissionError?: (error: PermissionResponse<'error'>) => void
-  }
+export type HandlerEvents = {
+  onPermissionChange?: (response: PermissionResponse) => void
+  onPermissionGranted?: (response: PermissionResponse<'granted'>) => void
+  onPermissionDenied?: (response: PermissionResponse<'denied'>) => void
+  onPermissionError?: (error: PermissionResponse<'error'>) => void
 }
 
 /**
@@ -221,12 +202,6 @@ export interface IPermissionHandler<T = void> {
   onPermissionError?: (
     callback: (response: PermissionResponse<'error'>) => void
   ) => void
-
-  /**
-   * A unique identifier for segmenting permission handler events to prevent conflicts.
-   * This allows you to create multiple handlers for different purposes.
-   */
-  eventId: string
 }
 
 /**

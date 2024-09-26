@@ -1,6 +1,6 @@
 import type {
   AsyncPermissionResponse,
-  EventsLogs,
+  HandlerEvents,
   IAsyncPermissionHandler,
   IPermissionHandler,
   PermissionHandlerOption,
@@ -28,22 +28,34 @@ export class PermissionsAPI {
   static #permissions: Permissions = navigator.permissions
 
   /**
-   * An object to store the current state of permissions.
+   * A weak map to manage event listeners for permission handlers.
    * @private
    * @static
-   * @type {Object<string, PermissionResponse>}
+   * @type {WeakMap<IPermissionHandler<void> | IAsyncPermissionHandler, HandlerEvents>}
    */
-  static #permissionStates: {
-    [key: string]: PermissionResponse
-  } = {}
+  static #events = new WeakMap<
+    IPermissionHandler | IAsyncPermissionHandler,
+    HandlerEvents
+  >()
 
   /**
-   * An object to manage event listeners for permission changes.
-   * @private
-   * @static
-   * @type {EventsLogs}
+   * Checks if the Permissions API is supported in the current browser/environment.
+   * If throwError is true and the Permissions API is not supported, an error is thrown.
+   *
+   * @param {boolean} [throwError=false] - If true, throws an error if the Permissions API is not supported.
+   * @returns {boolean} - True if the Permissions API is supported, false otherwise.
+   * @throws {Error}
    */
-  static #events: EventsLogs = {}
+  static isSupported(throwError: boolean = false): boolean {
+    const supported = !!PermissionsAPI.#permissions
+    if (!supported && throwError) {
+      throw new Error(
+        'Permissions API is not supported in this browser/environment.'
+      )
+    }
+
+    return supported
+  }
 
   /**
    * Retrieves a handler for synchronous permission requests.
@@ -58,17 +70,23 @@ export class PermissionsAPI {
     handlerOption?: PermissionHandlerOption
   ): IPermissionHandler {
     const _handler: IPermissionHandler = function (): void {
-      const _events = PermissionsAPI.#events[_handler.eventId]
+      const _events = PermissionsAPI.#events.get(_handler)
 
       PermissionsAPI.getPermission(permissionOption)
         .then((_permission) => {
           if (_events.onPermissionChange) {
-            _permission.status.onchange = function () {
-              _events.onPermissionChange({
-                name: this.name,
-                status: this,
-                state: this.state
-              })
+            _permission.onchange = () => {
+              if (_permission.state === 'denied') {
+                if (_events.onPermissionDenied)
+                  _events.onPermissionDenied(
+                    _permission as PermissionResponse<'denied'>
+                  )
+                if (handlerOption?.denied)
+                  handlerOption.denied(
+                    _permission as PermissionResponse<'denied'>
+                  )
+              }
+              _events.onPermissionChange(_permission)
             }
           }
 
@@ -97,8 +115,7 @@ export class PermissionsAPI {
             handlerOption.error(error as PermissionResponse<'error'>)
         })
     }
-    _handler.eventId = crypto.randomUUID()
-    PermissionsAPI.#events[_handler.eventId] = {}
+    PermissionsAPI.#events.set(_handler, {})
 
     return _handler
   }
@@ -116,17 +133,21 @@ export class PermissionsAPI {
     const _handler: IAsyncPermissionHandler =
       function (): Promise<AsyncPermissionResponse> {
         return new Promise<AsyncPermissionResponse>((resolve, reject) => {
-          const _events = PermissionsAPI.#events[_handler.eventId]
+          const _events = PermissionsAPI.#events.get(_handler)
 
           PermissionsAPI.getPermission(permissionOption)
             .then((_permission) => {
               if (_events.onPermissionChange) {
-                _permission.status.onchange = function () {
-                  _events.onPermissionChange({
-                    name: this.name,
-                    status: this,
-                    state: this.state
-                  })
+                _permission.onchange = () => {
+                  if (
+                    _permission.state === 'denied' &&
+                    _events.onPermissionDenied
+                  ) {
+                    _events.onPermissionDenied(
+                      _permission as PermissionResponse<'denied'>
+                    )
+                  }
+                  _events.onPermissionChange(_permission)
                 }
               }
 
@@ -160,8 +181,7 @@ export class PermissionsAPI {
             })
         })
       }
-    _handler.eventId = crypto.randomUUID()
-    PermissionsAPI.#events[_handler.eventId] = {}
+    PermissionsAPI.#events.set(_handler, {})
 
     return _handler
   }
@@ -178,11 +198,11 @@ export class PermissionsAPI {
    *  .then((permission) => {
    *    if (permission.state === 'denied') {
    *      // can't use geolocation service, notify the user
-   *      console.log('permission denied:', permission)
+   *      console.log('permission:', permission.state)
    *      return
    *    }
    *    // you can use the geolocation service here
-   *    console.log('permission is granted or will prompt the user for access', permission)
+   *    console.log('permission is granted or will prompt the user for access', permission.state)
    *  })
    *  .catch((reason: PermissionResponse<'error'>) => {
    *    console.error('Error fetching permission status:', reason.message)
@@ -193,10 +213,10 @@ export class PermissionsAPI {
    *  const permission = await PermissionsAPI.getPermission({ name: 'geolocation' })
    *  if (permission.state === 'denied') {
    *    // can't use geolocation service, notify the user
-   *    console.log('permission denied:', permission)
+   *    console.log('permission:', permission.state)
    *  } else {
    *    // you can use the geolocation service here
-   *    console.log('permission is granted or will prompt the user for access', permission)
+   *    console.log('permission is granted or will prompt the user for access', permission.state)
    *  }
    *} catch (error) {
    *  console.error('Error fetching permission status:', error)
@@ -208,17 +228,8 @@ export class PermissionsAPI {
     return new Promise(async (resolve, reject) => {
       try {
         const _status = await PermissionsAPI.#permissions.query(option as any)
-        const permissionStatus = {
-          state: _status.state,
-          status: _status,
-          name: _status.name
-        }
-        permissionStatus.status.addEventListener('change', function () {
-          PermissionsAPI.#permissionStates[option.name].state = this.state
-        })
-        PermissionsAPI.#permissionStates[option.name] = permissionStatus
 
-        return resolve(PermissionsAPI.#permissionStates[option.name])
+        return resolve(_status)
       } catch (error: any) {
         if (error.name === 'TypeError') {
           return reject({
@@ -248,10 +259,10 @@ export class PermissionsAPI {
    *  { name: 'notifications' },
    *  {
    *    granted: (permission) => {
-   *      console.log('Permission granted:', permission)
+   *      console.log('Permission:', permission.state)
    *    },
    *    denied: (permission) => {
-   *      console.log('Permission denied:', permission)
+   *      console.log('Permission:', permission.state)
    *    },
    *    error: (error) => {
    *      console.error('Permission error:', error)
@@ -268,13 +279,13 @@ export class PermissionsAPI {
    * })
    *
    * notificationHandler.onPermissionChange((permission) => {
-   *   console.log('User change permission:', permission)
+   *   console.log('User change permission:', permission.state)
    * })
    * notificationHandler.onPermissionGranted((permission) => {
-   *   console.log('Permission granted:', permission)
+   *   console.log('Permission:', permission.state)
    * })
    * notificationHandler.onPermissionDenied((permission) => {
-   *   console.log('Permission denied:', permission)
+   *   console.log('Permission:', permission.state)
    * })
    * notificationHandler.onPermissionError((error) => {
    *   console.error('Permission error:', error)
@@ -292,16 +303,16 @@ export class PermissionsAPI {
       handlerOption
     )
     handler.onPermissionChange = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionChange = callback
+      PermissionsAPI.#events.get(handler).onPermissionChange = callback
     }
     handler.onPermissionGranted = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionGranted = callback
+      PermissionsAPI.#events.get(handler).onPermissionGranted = callback
     }
     handler.onPermissionDenied = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionDenied = callback
+      PermissionsAPI.#events.get(handler).onPermissionDenied = callback
     }
     handler.onPermissionError = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionError = callback
+      PermissionsAPI.#events.get(handler).onPermissionError = callback
     }
 
     return Object.freeze(handler)
@@ -317,9 +328,9 @@ export class PermissionsAPI {
    * asyncCameraHandler()
    *   .then(({ granted, denied }) => {
    *     if (granted) {
-   *       console.log('Permission granted:', granted)
+   *       console.log('Permission:', granted.state)
    *     } else {
-   *       console.log('Permission denied:', denied)
+   *       console.log('Permission:', denied.state)
    *     }
    *   })
    *   .catch((error) => {
@@ -331,9 +342,9 @@ export class PermissionsAPI {
    * try {
    *   const { granted, denied } = await asyncCameraHandler()
    *   if (granted) {
-   *     console.log('Permission granted:', granted)
+   *     console.log('Permission:', granted.state)
    *   } else {
-   *     console.log('Permission denied:', denied)
+   *     console.log('Permission:', denied.state)
    *   }
    * } catch (error) {
    *   console.error('Async permission error:', error)
@@ -345,16 +356,16 @@ export class PermissionsAPI {
     const handler: IAsyncPermissionHandler =
       PermissionsAPI.#getAsyncHandler(permissionOption)
     handler.onPermissionChange = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionChange = callback
+      PermissionsAPI.#events.get(handler).onPermissionChange = callback
     }
     handler.onPermissionGranted = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionGranted = callback
+      PermissionsAPI.#events.get(handler).onPermissionGranted = callback
     }
     handler.onPermissionDenied = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionDenied = callback
+      PermissionsAPI.#events.get(handler).onPermissionDenied = callback
     }
     handler.onPermissionError = function (callback) {
-      PermissionsAPI.#events[handler.eventId].onPermissionError = callback
+      PermissionsAPI.#events.get(handler).onPermissionError = callback
     }
 
     return Object.freeze(handler)
