@@ -1,1 +1,1 @@
-export { PermissionsAPI } from '@arcstack/permissions/src/PermissionsAPI'
+export { PermissionsAPI } from '@arcstack/permissions'
