@@ -15,12 +15,12 @@ const compat = new FlatCompat({
 export default [
   {
     ignores: [
-      '**/*',
       '**/.vscode',
       '**/.pnpm-store',
       '**/.nx',
       '**/pnpm-*.yaml',
-      '**/node_modules'
+      '**/node_modules',
+      '**/dist'
     ]
   },
   {

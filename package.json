@@ -12,7 +12,6 @@
   "packageManager": "pnpm@9.2.0",
   "description": "A Comprehensive Integration of All Web Standard APIs",
   "scripts": {
-    "prebuild": "pnpx run-many -t build",
     "build": "tsup",
     "lint": "eslint **/* && tsc",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
