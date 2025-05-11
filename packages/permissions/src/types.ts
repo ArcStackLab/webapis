@@ -137,6 +137,8 @@ export type HandlerEvents = {
   onPermissionGranted?: (response: PermissionGranted) => void
   onPermissionDenied?: (response: PermissionDenied) => void
   onPermissionError?: (error: PermissionError) => void
+  eventListener?: () => void
+  permission?: PermissionGranted | PermissionDenied
 }
 
 /**
@@ -144,12 +146,18 @@ export type HandlerEvents = {
  * This interface defines the structure for handling permission requests.
  * @readonly
  */
-export interface IPermissionHandler<T = void> {
+export type PermissionHandler<T = void> = {
   /**
    * Executes the permission request.
    * @returns {T} - The result of the permission request.
    */
-  (): T
+  getPermission: () => T
+
+  /**
+   * Remove event listener and garage collect the permission handler
+   * The permission object will become null after calling close on the handler
+   */
+  close: () => void
 
   /**
    * Executes a callback whenever the user or user agent changes the permission status.
@@ -189,4 +197,4 @@ export interface IPermissionHandler<T = void> {
 /**
  * Interface for an asynchronous permission handler.
  */
-export type IAsyncPermissionHandler = IPermissionHandler<Promise<PermissionResponse>>
+export type AsyncPermissionHandler = PermissionHandler<Promise<PermissionResponse>>
