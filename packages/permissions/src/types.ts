@@ -27,46 +27,49 @@ export type PERMISSION_NAMES =
   | 'clipboard-read'
   | 'clipboard-write'
 
+export type PermissionOptionBase = {
+  /**
+   * Name of the API whose permissions you want to request.
+   */
+  name: PERMISSION_NAMES
+}
+
+export type PermissionOptionMidi = {
+  /**
+   * Name of the API whose permissions you want to request.
+   */
+  name: 'midi'
+  /**
+   * Indicates whether you need and/or receive system exclusive messages.
+   * The default is `false`.
+   */
+  sysex?: boolean
+}
+
+export type PermissionOptionPush = {
+  /**
+   * Name of the API whose permissions you want to request.
+   */
+  name: 'push'
+  /**
+   * Indicates whether you want to show a notification for every message
+   * or be able to send silent push notifications.
+   * The default is `false`.
+   */
+  userVisibleOnly?: boolean
+}
+
 /**
  * An object that sets options for the permission request.
  * The available options for this object depend on the permission type.
  */
-export type PermissionOption =
-  | {
-      /**
-       * Name of the API whose permissions you want to request.
-       */
-      name: PERMISSION_NAMES
-    }
-  | {
-      /**
-       * Name of the API whose permissions you want to request.
-       */
-      name: 'midi'
-      /**
-       * Indicates whether you need and/or receive system exclusive messages.
-       * The default is `false`.
-       */
-      sysex?: boolean
-    }
-  | {
-      /**
-       * Name of the API whose permissions you want to request.
-       */
-      name: 'push'
-      /**
-       * Indicates whether you want to show a notification for every message
-       * or be able to send silent push notifications.
-       * The default is `false`.
-       */
-      userVisibleOnly?: boolean
-    }
+export type PermissionOption = PermissionOptionBase | PermissionOptionMidi | PermissionOptionPush
 
 /**
  * Represents the state when the user or the user agent has given express permission,
  * or requires a prompt to approve the use of a feature.
  */
-type PermissionGranted = PermissionStatus & {
+export type PermissionGranted = PermissionStatus & {
   state: 'granted' | 'prompt'
 }
 
@@ -74,7 +77,7 @@ type PermissionGranted = PermissionStatus & {
  * Represents the state when the permission option is invalid
  * or the permission name is not supported by the user agent.
  */
-type PermissionError = {
+export type PermissionError = {
   state: 'unsupported' | 'invalid'
   message: string
   name: string
@@ -84,30 +87,17 @@ type PermissionError = {
  * Represents the state when the user or the user agent has denied access
  * to the requested feature.
  */
-type PermissionDenied = PermissionStatus & {
+export type PermissionDenied = PermissionStatus & {
   state: 'denied'
-}
-
-/**
- * Represents the state and status of a permission request.
- */
-type PermissionState = PermissionStatus & {
-  message?: string
 }
 
 /**
  * A generic response for a permission request.
  * The response can vary based on the permission state.
  */
-export type PermissionResponse<
-  Status extends 'granted' | 'denied' | 'error' | void = void
-> = Status extends 'granted'
-  ? PermissionGranted
-  : Status extends 'denied'
-    ? PermissionDenied
-    : Status extends 'error'
-      ? PermissionError
-      : PermissionState
+export type PermissionResponse =
+  | { error: PermissionError, permission: null }
+  | { error: null, permission: PermissionGranted | PermissionDenied }
 
 /**
  * Options for handling permission requests across all permission states:
@@ -143,10 +133,12 @@ export type PermissionHandlerOption = {
  * Permission handler events
  */
 export type HandlerEvents = {
-  onPermissionChange?: (response: PermissionResponse) => void
-  onPermissionGranted?: (response: PermissionResponse<'granted'>) => void
-  onPermissionDenied?: (response: PermissionResponse<'denied'>) => void
-  onPermissionError?: (error: PermissionResponse<'error'>) => void
+  onPermissionChange?: (response: PermissionGranted | PermissionDenied) => void
+  onPermissionGranted?: (response: PermissionGranted) => void
+  onPermissionDenied?: (response: PermissionDenied) => void
+  onPermissionError?: (error: PermissionError) => void
+  eventListener?: () => void
+  permission?: PermissionGranted | PermissionDenied
 }
 
 /**
@@ -154,12 +146,18 @@ export type HandlerEvents = {
  * This interface defines the structure for handling permission requests.
  * @readonly
  */
-export interface IPermissionHandler<T = void> {
+export type PermissionHandler<T = void> = {
   /**
    * Executes the permission request.
    * @returns {T} - The result of the permission request.
    */
-  (): T
+  getPermission: () => T
+
+  /**
+   * Remove event listener and garage collect the permission handler
+   * The permission object will become null after calling close on the handler
+   */
+  close: () => void
 
   /**
    * Executes a callback whenever the user or user agent changes the permission status.
@@ -167,9 +165,7 @@ export interface IPermissionHandler<T = void> {
    * @param callback - The callback function that will be called anytime the permission status changes.
    * @returns {void}
    */
-  onPermissionChange?: (
-    callback: (response: PermissionResponse) => void
-  ) => void
+  onPermissionChange?: (callback: (permission: PermissionGranted | PermissionDenied) => void) => void
 
   /**
    * Executes a callback if the permission status is `granted` or `prompt`.
@@ -180,18 +176,14 @@ export interface IPermissionHandler<T = void> {
    * @param callback - The callback function that will be called when the permission is `granted` or requires a `prompt`.
    * @returns {void}
    */
-  onPermissionGranted?: (
-    callback: (response: PermissionResponse<'granted'>) => void
-  ) => void
+  onPermissionGranted?: (callback: (permission: PermissionGranted) => void) => void
 
   /**
    * Executes a callback if the permission status is `denied` by the user or the user agent.
    * @param callback - The callback function that will be called when the permission is `denied`.
    * @returns {void}
    */
-  onPermissionDenied?: (
-    callback: (response: PermissionResponse<'denied'>) => void
-  ) => void
+  onPermissionDenied?: (callback: (permission: PermissionDenied) => void) => void
 
   /**
    * Executes a callback if the permission request encounters an error,
@@ -199,26 +191,10 @@ export interface IPermissionHandler<T = void> {
    * @param callback - The callback function that will be called when the permission request is not successful.
    * @returns {void}
    */
-  onPermissionError?: (
-    callback: (response: PermissionResponse<'error'>) => void
-  ) => void
+  onPermissionError?: (callback: (error: PermissionError) => void) => void
 }
-
-/**
- * Represents the asynchronous response for a permission request.
- */
-export type AsyncPermissionResponse =
-  | {
-      granted: PermissionResponse<'granted'>
-      denied: null
-    }
-  | {
-      granted: null
-      denied: PermissionResponse<'denied'>
-    }
 
 /**
  * Interface for an asynchronous permission handler.
  */
-export interface IAsyncPermissionHandler
-  extends IPermissionHandler<Promise<AsyncPermissionResponse>> {}
+export type AsyncPermissionHandler = PermissionHandler<Promise<PermissionResponse>>

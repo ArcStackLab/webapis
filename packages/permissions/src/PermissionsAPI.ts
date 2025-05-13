@@ -1,10 +1,12 @@
 import type {
-  AsyncPermissionResponse,
+  AsyncPermissionHandler,
   HandlerEvents,
-  IAsyncPermissionHandler,
-  IPermissionHandler,
+  PermissionHandler,
   PermissionHandlerOption,
   PermissionOption,
+  PermissionOptionBase,
+  PermissionOptionMidi,
+  PermissionOptionPush,
   PermissionResponse
 } from './types'
 
@@ -20,21 +22,50 @@ import type {
  */
 export class PermissionsAPI {
   /**
+   * Permission names of permissions api
+   * @public
+   * @static
+   */
+  static permissionNames = [
+    'background-sync',
+    'geolocation',
+    'local-fonts',
+    'microphone',
+    'camera',
+    'notifications',
+    'payment-handler',
+    'push',
+    'screen-wake-lock',
+    'accelerometer',
+    'gyroscope',
+    'magnetometer',
+    'ambient-light-sensor',
+    'storage-access',
+    'top-level-storage-access',
+    'persistent-storage',
+    'midi',
+    'window-management',
+    'accessibility-events',
+    'clipboard-read',
+    'clipboard-write'
+  ] as const
+
+  /**
    * A reference to the Permissions API provided by the browser.
    * @private
    * @static
    * @type {Permissions}
    */
-  static #permissions: Permissions = navigator.permissions
+  static #permissions = navigator.permissions
 
   /**
    * A weak map to manage event listeners for permission handlers.
    * @private
    * @static
-   * @type {WeakMap<IPermissionHandler<void> | IAsyncPermissionHandler, HandlerEvents>}
+   * @type {WeakMap<(PermissionHandler<void> | AsyncPermissionHandler), HandlerEvents>}
    */
   static #events = new WeakMap<
-    IPermissionHandler | IAsyncPermissionHandler,
+    PermissionHandler | AsyncPermissionHandler,
     HandlerEvents
   >()
 
@@ -46,7 +77,9 @@ export class PermissionsAPI {
    * @returns {boolean} - True if the Permissions API is supported, false otherwise.
    * @throws {Error}
    */
-  static isSupported(throwError: boolean = false): boolean {
+  static isSupported(): boolean
+  static isSupported(throwError: boolean): boolean
+  static isSupported(throwError = false) {
     const supported = !!PermissionsAPI.#permissions
     if (!supported && throwError) {
       throw new Error(
@@ -58,144 +91,18 @@ export class PermissionsAPI {
   }
 
   /**
-   * Retrieves a handler for synchronous permission requests.
-   * @private
-   * @static
-   * @param {PermissionOption} permissionOption - The permission option to request.
-   * @param {PermissionHandlerOption} [handlerOption] - Optional handler options for granted/denied/error callbacks.
-   * @returns {IPermissionHandler} - A permission handler for synchronous requests.
-   */
-  static #getHandler(
-    permissionOption: PermissionOption,
-    handlerOption?: PermissionHandlerOption
-  ): IPermissionHandler {
-    const _handler: IPermissionHandler = function (): void {
-      const _events = PermissionsAPI.#events.get(_handler)
-
-      PermissionsAPI.getPermission(permissionOption)
-        .then((_permission) => {
-          if (_events.onPermissionChange) {
-            _permission.onchange = () => {
-              if (_permission.state === 'denied') {
-                if (_events.onPermissionDenied)
-                  _events.onPermissionDenied(
-                    _permission as PermissionResponse<'denied'>
-                  )
-                if (handlerOption?.denied)
-                  handlerOption.denied(
-                    _permission as PermissionResponse<'denied'>
-                  )
-              }
-              _events.onPermissionChange(_permission)
-            }
-          }
-
-          if (_permission.state === 'denied') {
-            if (_events.onPermissionDenied)
-              _events.onPermissionDenied(
-                _permission as PermissionResponse<'denied'>
-              )
-            if (handlerOption?.denied)
-              handlerOption.denied(_permission as PermissionResponse<'denied'>)
-          } else {
-            if (_events.onPermissionGranted)
-              _events.onPermissionGranted(
-                _permission as PermissionResponse<'granted'>
-              )
-            if (handlerOption?.granted)
-              handlerOption.granted(
-                _permission as PermissionResponse<'granted'>
-              )
-          }
-        })
-        .catch((error) => {
-          if (_events.onPermissionError)
-            _events.onPermissionError(error as PermissionResponse<'error'>)
-          if (handlerOption?.error)
-            handlerOption.error(error as PermissionResponse<'error'>)
-        })
-    }
-    PermissionsAPI.#events.set(_handler, {})
-
-    return _handler
-  }
-
-  /**
-   * Retrieves a handler for asynchronous permission requests.
-   * @private
-   * @static
-   * @param {PermissionOption} permissionOption - The permission option to request.
-   * @returns {IAsyncPermissionHandler} - A permission handler for asynchronous requests.
-   */
-  static #getAsyncHandler(
-    permissionOption: PermissionOption
-  ): IAsyncPermissionHandler {
-    const _handler: IAsyncPermissionHandler =
-      function (): Promise<AsyncPermissionResponse> {
-        return new Promise<AsyncPermissionResponse>((resolve, reject) => {
-          const _events = PermissionsAPI.#events.get(_handler)
-
-          PermissionsAPI.getPermission(permissionOption)
-            .then((_permission) => {
-              if (_events.onPermissionChange) {
-                _permission.onchange = () => {
-                  if (
-                    _permission.state === 'denied' &&
-                    _events.onPermissionDenied
-                  ) {
-                    _events.onPermissionDenied(
-                      _permission as PermissionResponse<'denied'>
-                    )
-                  }
-                  _events.onPermissionChange(_permission)
-                }
-              }
-
-              if (_permission.state === 'denied') {
-                if (_events.onPermissionDenied)
-                  _events.onPermissionDenied(
-                    _permission as PermissionResponse<'denied'>
-                  )
-
-                return resolve({
-                  granted: null,
-                  denied: _permission as PermissionResponse<'denied'>
-                })
-              } else {
-                if (_events.onPermissionGranted)
-                  _events.onPermissionGranted(
-                    _permission as PermissionResponse<'granted'>
-                  )
-
-                return resolve({
-                  granted: _permission as PermissionResponse<'granted'>,
-                  denied: null
-                })
-              }
-            })
-            .catch((error) => {
-              if (_events.onPermissionError)
-                _events.onPermissionError(error as PermissionResponse<'error'>)
-
-              return reject(error as PermissionResponse<'error'>)
-            })
-        })
-      }
-    PermissionsAPI.#events.set(_handler, {})
-
-    return _handler
-  }
-
-  /**
    * @async
    * Gets the permission status for any valid permission name provided in the option object.
    * @param {PermissionOption} option - Permission request option.
    * @returns {Promise<PermissionResponse>} - A promise that resolves to the permission response or an error response.
-   * @throws {PermissionResponse<'error'>}
    *
    * @example
    * PermissionsAPI.getPermission({ name: 'geolocation' })
-   *  .then((permission) => {
+   *  .then(({ error, permission }) => {
+   *    if (error) {
+   *      console.error('Error fetching permission status:', error.message)
+   *      return
+   *    }
    *    if (permission.state === 'denied') {
    *      // can't use geolocation service, notify the user
    *      console.log('permission:', permission.state)
@@ -204,53 +111,148 @@ export class PermissionsAPI {
    *    // you can use the geolocation service here
    *    console.log('permission is granted or will prompt the user for access', permission.state)
    *  })
-   *  .catch((reason: PermissionResponse<'error'>) => {
-   *    console.error('Error fetching permission status:', reason.message)
-   *  })
    *
    * @example
-   * try {
-   *  const permission = await PermissionsAPI.getPermission({ name: 'geolocation' })
-   *  if (permission.state === 'denied') {
-   *    // can't use geolocation service, notify the user
-   *    console.log('permission:', permission.state)
-   *  } else {
-   *    // you can use the geolocation service here
-   *    console.log('permission is granted or will prompt the user for access', permission.state)
-   *  }
-   *} catch (error) {
-   *  console.error('Error fetching permission status:', error)
-   *}
+   * const { error, permission } = await PermissionsAPI.getPermission({ name: 'geolocation' })
+   * if (error) {
+   *  console.error('Error fetching permission status:', error.message)
+   * } else if (permission.state === 'denied') {
+   *   // can't use geolocation service, notify the user
+   *   console.log('permission:', permission.state)
+   * } else {
+   *   // you can use the geolocation service here
+   *   console.log('permission is granted or will prompt the user for access', permission.state)
+   * }
    */
-  static getPermission(option: PermissionOption): Promise<PermissionResponse> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const _status = await PermissionsAPI.#permissions.query(option as any)
+  static async getPermission(
+    option: PermissionOptionBase
+  ): Promise<PermissionResponse>
+  static async getPermission(
+    option: PermissionOptionMidi
+  ): Promise<PermissionResponse>
+  static async getPermission(
+    option: PermissionOptionPush
+  ): Promise<PermissionResponse>
+  static async getPermission(
+    option: PermissionOption
+  ): Promise<PermissionResponse> {
+    try {
+      const _status = await PermissionsAPI.#permissions.query(
+        option as PermissionDescriptor
+      )
 
-        return resolve(_status)
-      } catch (error: any) {
-        if (error.name === 'TypeError') {
-          return reject({
+      return { error: null, permission: _status }
+    } catch (error) {
+      if (error.name === 'TypeError') {
+        return {
+          error: {
             state: 'unsupported',
             name: error.name,
             message: error.message
-          })
+          },
+          permission: null
         }
-
-        return reject({
-          state: 'invalid',
-          name: error.name,
-          message: error.message
-        })
       }
-    })
+
+      return {
+        error: { state: 'invalid', name: error.name, message: error.message },
+        permission: null
+      }
+    }
+  }
+
+  /**
+   * Retrieves a handler for synchronous permission requests.
+   * @private
+   * @static
+   * @param {PermissionOption} permissionOption - The permission option to request.
+   * @param {PermissionHandlerOption} [handlerOption] - Optional handler options for granted/denied/error callbacks.
+   * @returns {PermissionHandler} - A permission handler for synchronous requests.
+   */
+  static #getHandler(permissionOption: PermissionOptionBase): PermissionHandler
+  static #getHandler(
+    permissionOption: PermissionOptionBase,
+    handlerOption: PermissionHandlerOption
+  ): PermissionHandler
+  static #getHandler(permissionOption: PermissionOptionMidi): PermissionHandler
+  static #getHandler(
+    permissionOption: PermissionOptionMidi,
+    handlerOption: PermissionHandlerOption
+  ): PermissionHandler
+  static #getHandler(permissionOption: PermissionOptionPush): PermissionHandler
+  static #getHandler(
+    permissionOption: PermissionOptionPush,
+    handlerOption: PermissionHandlerOption
+  ): PermissionHandler
+  static #getHandler(
+    permissionOption: PermissionOption,
+    handlerOption?: PermissionHandlerOption
+  ): PermissionHandler {
+    let _handler: PermissionHandler = {
+      close: () => {
+        if (_handler) {
+          const _events = PermissionsAPI.#events.get(_handler)
+          if (_events.permission) {
+            _events.permission.removeEventListener('change', _events.eventListener)
+          }
+          PermissionsAPI.#events.delete(_handler)
+          _handler = null
+        }
+      },
+      getPermission: () => {
+        const _events = PermissionsAPI.#events.get(_handler)
+
+        PermissionsAPI.getPermission(permissionOption).then(
+          ({ error, permission }) => {
+            if (error) {
+              if (_events.onPermissionError) _events.onPermissionError(error)
+              if (handlerOption?.error) handlerOption.error(error)
+              return
+            }
+
+            if (_events.permission) {
+              _events.permission.removeEventListener('change', _events.eventListener)
+            }
+
+            _events.permission = permission
+            _events.eventListener = () => {
+              if (permission.state === 'denied') {
+                if (_events.onPermissionDenied)
+                  _events.onPermissionDenied(permission)
+              } else {
+                if (_events.onPermissionGranted)
+                  _events.onPermissionGranted(permission)
+              }
+              if (_events.onPermissionChange) {
+                _events.onPermissionChange(permission)
+              }
+            }
+
+            permission.addEventListener('change', _events.eventListener)
+
+            if (permission.state === 'denied') {
+              if (_events.onPermissionDenied)
+                _events.onPermissionDenied(permission)
+              if (handlerOption?.denied) handlerOption.denied(permission)
+            } else {
+              if (_events.onPermissionGranted)
+                _events.onPermissionGranted(permission)
+              if (handlerOption?.granted) handlerOption.granted(permission)
+            }
+          }
+        )
+      }
+    }
+    PermissionsAPI.#events.set(_handler, {})
+
+    return _handler
   }
 
   /**
    * Creates a permission handler for synchronous permission requests.
    * @param {PermissionOption} permissionOption - The permission option to request.
    * @param {PermissionHandlerOption} [handlerOption] - Optional handler options for granted/denied/error callbacks.
-   * @returns {IPermissionHandler} - A permission handler for synchronous requests.
+   * @returns {PermissionHandler} - A permission handler for synchronous requests.
    *
    * @example
    * const notificationHandler = PermissionsAPI.getPermissionHandler(
@@ -263,13 +265,14 @@ export class PermissionsAPI {
    *      console.log('Permission:', permission.state)
    *    },
    *    error: (error) => {
+   *      notificationHandler.close()
    *      console.error('Permission error:', error)
    *    }
    *  }
    * )
    *
    * // Initiate the handler by calling the handler function
-   * notificationHandler()
+   * notificationHandler.getPermission()
    *
    * @example
    * const notificationHandler = PermissionsAPI.getPermissionHandler({
@@ -286,30 +289,52 @@ export class PermissionsAPI {
    *   console.log('Permission:', permission.state)
    * })
    * notificationHandler.onPermissionError((error) => {
+   *   notificationHandler.close()
    *   console.error('Permission error:', error)
    * })
    *
    * // Initiate the handler by calling the handler function
-   * notificationHandler()
+   * notificationHandler.getPermission()
    */
+  static getPermissionHandler(
+    permissionOption: PermissionOptionBase
+  ): PermissionHandler
+  static getPermissionHandler(
+    permissionOption: PermissionOptionBase,
+    handlerOption?: PermissionHandlerOption
+  ): PermissionHandler
+  static getPermissionHandler(
+    permissionOption: PermissionOptionMidi
+  ): PermissionHandler
+  static getPermissionHandler(
+    permissionOption: PermissionOptionMidi,
+    handlerOption?: PermissionHandlerOption
+  ): PermissionHandler
+  static getPermissionHandler(
+    permissionOption: PermissionOptionPush
+  ): PermissionHandler
+  static getPermissionHandler(
+    permissionOption: PermissionOptionPush,
+    handlerOption?: PermissionHandlerOption
+  ): PermissionHandler
   static getPermissionHandler(
     permissionOption: PermissionOption,
     handlerOption?: PermissionHandlerOption
-  ): IPermissionHandler {
-    const handler: IPermissionHandler = PermissionsAPI.#getHandler(
+  ): PermissionHandler {
+    const handler: PermissionHandler = PermissionsAPI.#getHandler(
       permissionOption,
       handlerOption
     )
-    handler.onPermissionChange = function (callback) {
+    handler.onPermissionChange = (callback) => {
       PermissionsAPI.#events.get(handler).onPermissionChange = callback
     }
-    handler.onPermissionGranted = function (callback) {
+    handler.onPermissionGranted = (callback) => {
       PermissionsAPI.#events.get(handler).onPermissionGranted = callback
     }
-    handler.onPermissionDenied = function (callback) {
+    handler.onPermissionDenied = (callback) => {
       PermissionsAPI.#events.get(handler).onPermissionDenied = callback
     }
-    handler.onPermissionError = function (callback) {
+    handler.onPermissionError = (callback) => {
       PermissionsAPI.#events.get(handler).onPermissionError = callback
     }
 
@@ -317,41 +342,128 @@ export class PermissionsAPI {
   }
 
   /**
+   * Retrieves a handler for asynchronous permission requests.
+   * @private
+   * @static
+   * @param {PermissionOption} permissionOption - The permission option to request.
+   * @returns {AsyncPermissionHandler} - A permission handler for asynchronous requests.
+   */
+  static #getAsyncHandler(
+    permissionOption: PermissionOptionBase
+  ): AsyncPermissionHandler
+  static #getAsyncHandler(
+    permissionOption: PermissionOptionMidi
+  ): AsyncPermissionHandler
+  static #getAsyncHandler(
+    permissionOption: PermissionOptionPush
+  ): AsyncPermissionHandler
+  static #getAsyncHandler(
+    permissionOption: PermissionOption
+  ): AsyncPermissionHandler {
+    let _handler: AsyncPermissionHandler = {
+      close: () => {
+        if (_handler) {
+          const _events = PermissionsAPI.#events.get(_handler)
+          if (_events.permission) {
+            _events.permission.removeEventListener('change', _events.eventListener)
+          }
+          PermissionsAPI.#events.delete(_handler)
+          _handler = null
+        }
+      },
+      getPermission: async (): Promise<PermissionResponse> => {
+        const _events = PermissionsAPI.#events.get(_handler)
+
+        const { error, permission } =
+          await PermissionsAPI.getPermission(permissionOption)
+        if (error) {
+          if (_events.onPermissionError) _events.onPermissionError(error)
+
+          return { error, permission: null }
+        }
+
+        if (_events.permission) {
+          _events.permission.removeEventListener('change', _events.eventListener)
+        }
+
+        _events.permission = permission
+        _events.eventListener = () => {
+          if (permission.state === 'denied') {
+            if (_events.onPermissionDenied)
+              _events.onPermissionDenied(permission)
+          } else {
+            if (_events.onPermissionGranted)
+              _events.onPermissionGranted(permission)
+          }
+          if (_events.onPermissionChange) {
+            _events.onPermissionChange(permission)
+          }
+        }
+
+        permission.addEventListener('change', _events.eventListener)
+
+        if (permission.state === 'denied') {
+          if (_events.onPermissionDenied) _events.onPermissionDenied(permission)
+
+          return { error: null, permission }
+        } else {
+          if (_events.onPermissionGranted)
+            _events.onPermissionGranted(permission)
+
+          return { error: null, permission }
+        }
+      }
+    }
+    PermissionsAPI.#events.set(_handler, {})
+
+    return _handler
+  }
+
+  /**
    * Creates a permission handler for asynchronous permission requests.
    * @param {PermissionOption} permissionOption - The permission option to request.
-   * @returns {IAsyncPermissionHandler} - A permission handler for asynchronous requests.
+   * @returns {AsyncPermissionHandler} - A permission handler for asynchronous requests.
    *
    * @example
    * const asyncCameraHandler = PermissionsAPI.getAsyncPermissionHandler({ name: 'camera' })
-   * asyncCameraHandler()
-   *   .then(({ granted, denied }) => {
-   *     if (granted) {
-   *       console.log('Permission:', granted.state)
+   * asyncCameraHandler.getPermission()
+   *   .then(({ error, permission }) => {
+   *     if (error) {
+   *       console.error('Async permission error:', error)
+   *       return
+   *     }
+   *
+   *     if (permission.state === 'denied') {
+   *       console.log('Permission:', permission.state)
    *     } else {
-   *       console.log('Permission:', denied.state)
+   *       console.log('Permission:', permission.state)
    *     }
    *   })
-   *   .catch((error) => {
-   *     console.error('Async permission error:', error)
-   *   })
    *
    * @example
    * const asyncCameraHandler = PermissionsAPI.getAsyncPermissionHandler({ name: 'camera' })
-   * try {
-   *   const { granted, denied } = await asyncCameraHandler()
-   *   if (granted) {
-   *     console.log('Permission:', granted.state)
-   *   } else {
-   *     console.log('Permission:', denied.state)
-   *   }
-   * } catch (error) {
+   * const { error, permission } = await asyncCameraHandler.getPermission()
+   * if (error) {
    *   console.error('Async permission error:', error)
+   * } else if (permission.state === 'denied') {
+   *   console.log('Permission:', permission.state)
+   * } else {
+   *   console.log('Permission:', permission.state)
    * }
    */
   static getAsyncPermissionHandler(
+    permissionOption: PermissionOptionBase
+  ): AsyncPermissionHandler
+  static getAsyncPermissionHandler(
+    permissionOption: PermissionOptionMidi
+  ): AsyncPermissionHandler
+  static getAsyncPermissionHandler(
+    permissionOption: PermissionOptionPush
+  ): AsyncPermissionHandler
+  static getAsyncPermissionHandler(
     permissionOption: PermissionOption
-  ): IAsyncPermissionHandler {
-    const handler: IAsyncPermissionHandler =
+  ): AsyncPermissionHandler {
+    const handler: AsyncPermissionHandler =
       PermissionsAPI.#getAsyncHandler(permissionOption)
     handler.onPermissionChange = function (callback) {
       PermissionsAPI.#events.get(handler).onPermissionChange = callback

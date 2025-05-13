@@ -163,5 +163,7 @@ testem.log
 tmp
 /out-tsc
 
+.nx
 .nx/cache
 .nx/workspace-data
+.cursor

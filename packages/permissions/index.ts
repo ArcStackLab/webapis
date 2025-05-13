@@ -3,13 +3,5 @@
  *
  * @module PermissionsAPI
  */
-export { PermissionsAPI } from './src/PermissionsAPI'
-export type {
-  PERMISSION_NAMES,
-  PermissionOption,
-  PermissionResponse,
-  PermissionHandlerOption,
-  IPermissionHandler,
-  AsyncPermissionResponse,
-  IAsyncPermissionHandler
-} from './src/types'
+export * from './src/PermissionsAPI'
+export type * from './src/types'

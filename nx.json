@@ -21,6 +21,14 @@
       }
     }
   ],
-  "nxCloudId": "66b806726340ec37c5b8ec1b",
-  "nxCloudAccessToken": "MmNiOTc0NDQtZDNhZS00Njg1LWE4M2EtMjUxNTQzNzNiOTU1fHJlYWQ="
+  "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ],
+    "default": [
+      "sharedGlobals"
+    ]
+  },
+  "nxCloudId": "681f1bf43845db51336764b6",
+  "nxCloudAccessToken": "OWM0ZThhYWItODQwYS00ZjgzLWJhMWMtODYyOTgzMDVjMmZhfHJlYWQtd3JpdGU="
 }
