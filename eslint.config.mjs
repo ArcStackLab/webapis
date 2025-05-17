@@ -20,7 +20,8 @@ export default [
       '**/.nx',
       '**/pnpm-*.yaml',
       '**/node_modules',
-      '**/dist'
+      '**/dist',
+      '**/*.html'
     ]
   },
   {

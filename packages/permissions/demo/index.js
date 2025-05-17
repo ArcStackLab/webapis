@@ -19,7 +19,7 @@ function createOptionTag(value) {
 }
 
 /**
- * @type {ReturnType<PermissionsAPI.getPermissionHandler>}
+ * @type {ReturnType<getPermissionHandler>}
  */
 let permissionHandler
 const closeButton = document.querySelector('#close')
@@ -49,7 +49,7 @@ const stateColor = {
 }
 
 function handlePermission(option) {
-  permissionHandler = PermissionsAPI.getPermissionHandler(option, {
+  permissionHandler = getPermissionHandler(option, {
     granted: (permission) => {
       console.log('Permission Granted:', permission)
       state.replaceChildren(
