@@ -202,6 +202,8 @@ export class PermissionsAPI {
       getPermission: () => {
         const _events = PermissionsAPI.#events.get(_handler)
 
+        if (!_events || _handler === null) throw new Error('Cannot get permission: handler has been closed')
+
         PermissionsAPI.getPermission(permissionOption).then(
           ({ error, permission }) => {
             if (error) {
