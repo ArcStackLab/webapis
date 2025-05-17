@@ -150,6 +150,7 @@ export type PermissionHandler<T = void> = {
   /**
    * Executes the permission request.
    * @returns {T} - The result of the permission request.
+   * @throws {Error} - Throws if handler is already closed
    */
   getPermission: () => T
 
