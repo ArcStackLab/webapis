@@ -3,17 +3,20 @@
   "version": "0.0.1",
   "namespace": "@arcstack",
   "type": "module",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ArcStackLab/webapis.git"
   },
-  "packageManager": "pnpm@9",
   "description": "A Comprehensive Integration of All Web Standard APIs",
   "scripts": {
-    "build": "tsup",
+    "build": "nx run-many --target=build",
+    "predist": "rm -rf dist",
+    "dist": "gulp dist",
+    "predemos": "rm -rf demos/out",
+    "demos": "gulp demos",
     "lint": "eslint **/* && tsc",
+    "clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -not -path '*/.nx/*'",
+    "unsafe-clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -not -path '*/.nx/*' -exec rm -rf {} +",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
   },
   "husky": {
@@ -27,22 +30,7 @@
     ]
   },
   "entry": {
-    ".": "./dist/index.js",
     "permissions": "./dist/permissions.js"
-  },
-  "tsup": {
-    "entry": {
-      "index": "./index.ts",
-      "permissions": "./packages/permissions/index.ts"
-    },
-    "splitting": false,
-    "sourcemap": true,
-    "dts": true,
-    "clean": true,
-    "platform": "browser",
-    "format": [
-      "esm"
-    ]
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
@@ -54,6 +42,7 @@
     "globals": "^15.9.0",
     "gulp": "^5.0.0",
     "gulp-cli": "^3.0.0",
+    "gulp-flatten": "^0.4.0",
     "husky": "^9.1.5",
     "lint-staged": "^15.2.10",
     "netlify-cli": "^21.4.2",
@@ -70,5 +59,6 @@
     "api"
   ],
   "author": "factman",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.4"
 }
