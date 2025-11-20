@@ -1,4 +1,4 @@
-import { PermissionsAPI } from '../dist/permissions.js'
+import { PermissionsAPI } from '../dist/permissions.min.js'
 
 const permissions = new PermissionsAPI()
 
