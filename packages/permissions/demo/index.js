@@ -1,6 +1,6 @@
 import { PermissionsAPI } from '../dist/permissions.js'
 
-const { isSupported, permissionNames, getPermissionHandler } = PermissionsAPI
+const permissions = new PermissionsAPI()
 
 function createCodeTag(text, color = '#e3e3e3') {
   const code = document.createElement('code')
@@ -49,7 +49,7 @@ const stateColor = {
 }
 
 function handlePermission(option) {
-  permissionHandler = getPermissionHandler(option, {
+  permissionHandler = permissions.createHandler(option, {
     granted: (permission) => {
       console.log('Permission Granted:', permission)
       state.replaceChildren(
@@ -84,15 +84,15 @@ function handlePermission(option) {
 
 document
   .querySelector('#support')
-  .appendChild(createCodeTag(isSupported().toString()))
+  .appendChild(createCodeTag(permissions.isSupported().toString()))
 document
   .querySelector('#names')
-  .append(...permissionNames.map((name) => createCodeTag(name)))
+  .append(...PermissionsAPI.permissionNames.map((name) => createCodeTag(name)))
 
 const selectPermissions = [
   'unsupported-permission',
   'invalid-permission',
-  ...permissionNames
+  ...PermissionsAPI.permissionNames
 ]
 const select = document.querySelector('#select')
 select.append(...selectPermissions.map(createOptionTag))
