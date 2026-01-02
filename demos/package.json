@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "compile:demos": "cd .. && pnpm demos && cd demos",
+    "compile:demos": "cd .. && pnpm demos",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
