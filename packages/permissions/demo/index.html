@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Permissions</title>
+  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/styles/atom-one-dark.min.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
+  <style>
+    html,
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: auto;
+      width: min(700px, 100%);
+    }
+
+    td {
+      padding: 0.5em;
+    }
+
+    select {
+      display: block;
+      width: 100%;
+      padding: 0.5em;
+    }
+
+    .code-container {
+      border: 1px solid lightgray;
+      border-radius: 10px;
+      padding: 0.5em;
+      margin: 1em auto;
+      cursor: pointer;
+    }
+
+    .code-container p {
+      margin: 0 0 0.5em;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th colspan="2">
+          <h3>PermissionsAPI</h3>
+        </th>
+      </tr>
+      <tr>
+        <th>Parameter</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+
+    <body>
+      <tr>
+        <td>isSupported</td>
+        <td id="support"></td>
+      </tr>
+      <tr>
+        <td>permissionNames</td>
+        <td id="names"></td>
+      </tr>
+      <tr>
+        <td>permission</td>
+        <td>
+          <select id="select">
+            <option disabled selected>Select permission...</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>permissionState</td>
+        <td id="state"><span>-</span></td>
+      </tr>
+      <tr>
+        <td>permissionError</td>
+        <td><span id="error">-</span></td>
+      </tr>
+      <tr>
+        <td>closeHandler</td>
+        <td id="close"></td>
+      </tr>
+    </body>
+  </table>
+
+  <h2>PermissionsAPI Usage Examples</h2>
+
+  <div class="code-container">
+    <p onclick="toggleCodeView(this)">PermissionsAPI.isSupported</p>
+    <pre id="isSupported" style="display: none;">
+      <code class="language-javascript">
+// Checks if the Permissions API is supported in the current browser/environment.
+
+const permissions = new PermissionsAPI()
+
+const support = permissions.isSupported()
+console.log(support) // True or False
+
+// Exception example
+
+try {
+  const support = permissions.isSupported(true)
+  console.log(support) // True
+  ...
+} catch(error) {
+  console.log(error.message) // Permissions API is not supported in this browser/environment.
+}
+      </code>
+    </pre>
+  </div>
+
+  <div class="code-container">
+    <p onclick="toggleCodeView(this)">PermissionsAPI.getPermission</p>
+    <pre id="getPermission" style="display: none;">
+      <code class="language-javascript">
+// Promise example
+
+const permissions = new PermissionsAPI()
+
+permissions.getPermission({ name: 'geolocation' })
+  .then(({ error, permission }) => {
+    if (error) {
+      console.error('Error fetching permission status:', error.message)
+      return
+    }
+    if (permission.state === 'denied') {
+      // can't use geolocation service, notify the user
+      console.log('permission:', permission.state)
+      return
+    }
+    // you can use the geolocation service here
+    console.log('permission is granted or will prompt the user for access', permission.state)
+  })
+      </code>
+
+      <code class="language-javascript">
+// Async await example
+
+const permissions = new PermissionsAPI()
+
+async function geolocation() {
+  const { error, permission } = await permissions.getPermission({ name: 'geolocation' })
+
+  if (error) {
+    console.error('Error fetching permission status:', error.message)
+  } else if (permission.state === 'denied') {
+    // can't use geolocation service, notify the user
+    console.log('permission:', permission.state)
+  } else {
+    // you can use the geolocation service here
+    console.log('permission is granted or will prompt the user for access', permission.state)
+  }
+}
+      </code>
+</pre>
+  </div>
+
+  <div class="code-container">
+    <p onclick="toggleCodeView(this)">PermissionsAPI.getPermissionHandler</p>
+    <pre id="getPermissionHandler" style="display: none;">
+      <code class="language-javascript">
+// Callback example
+
+const permissions = new PermissionsAPI()
+
+const notificationHandler = permissions.createHandler(
+  { name: 'notifications' },
+  {
+    granted: (permission) => {
+      console.log('Permission:', permission.state)
+    },
+    denied: (permission) => {
+      console.log('Permission:', permission.state)
+    },
+    error: (error) => {
+      notificationHandler.close()
+      console.error('Permission error:', error)
+    }
+  }
+)
+
+// Initiate the handler by calling the handler function
+notificationHandler.getPermission()
+      </code>
+
+      <code class="language-javascript">
+// Event handling example
+
+const permissions = new PermissionsAPI()
+
+const notificationHandler = permissions.createHandler({ name: 'notifications' })
+
+notificationHandler.onPermissionChange((permission) => {
+  console.log('User change permission:', permission.state) // granted or denied
+})
+notificationHandler.onPermissionGranted((permission) => {
+  console.log('Permission:', permission.state)
+})
+notificationHandler.onPermissionDenied((permission) => {
+  console.log('Permission:', permission.state)
+})
+notificationHandler.onPermissionError((error) => {
+  notificationHandler.close()
+  console.error('Permission error:', error)
+})
+
+// Initiate the handler by calling the handler function
+notificationHandler.getPermission()
+      </code>
+
+      <code class="language-javascript">
+// Callback and Event example
+
+const permissions = new PermissionsAPI()
+
+const notificationHandler = permissions.createHandler(
+  { name: 'notifications' },
+  {
+    granted: (permission) => {
+      console.log('Permission:', permission.state)
+    },
+    denied: (permission) => {
+      console.log('Permission:', permission.state)
+    },
+    error: (error) => {
+      notificationHandler.close()
+      console.error('Permission error:', error)
+    }
+  }
+)
+
+notificationHandler.onPermissionChange((permission) => {
+  console.log('User change permission:', permission.state) // granted or denied
+})
+
+// Initiate the handler by calling the handler function
+notificationHandler.getPermission()
+      </code>
+</pre>
+  </div>
+
+  <div class="code-container">
+    <p onclick="toggleCodeView(this)">PermissionsAPI.getAsyncPermissionHandler</p>
+    <pre id="getAsyncPermissionHandler" style="display: none;">
+      <code class="language-javascript">
+// Promise example
+
+const permissions = new PermissionsAPI()
+
+const asyncCameraHandler = permissions.createAsyncHandler({ name: 'camera' })
+asyncCameraHandler.getPermission().then(({ error, permission }) => {
+  if (error) {
+    asyncCameraHandler.close()
+    console.error('Async permission error:', error)
+    return
+  }
+
+  if (permission.state === 'denied') {
+    console.log('Permission:', permission.state)
+  } else {
+    console.log('Permission:', permission.state)
+  }
+})
+      </code>
+
+      <code class="language-javascript">
+
+// Async await example
+
+const permissions = new PermissionsAPI()
+
+async function camera() {
+  const asyncCameraHandler = permissions.createAsyncHandler({ name: 'camera' })
+  const { error, permission } = await asyncCameraHandler.getPermission()
+
+  if (error) {
+    asyncCameraHandler.close()
+    console.error('Async permission error:', error)
+  } else if (permission.state === 'denied') {
+    console.log('Permission:', permission.state)
+  } else {
+    console.log('Permission:', permission.state)
+  }
+}
+      </code>
+
+      <code class="language-javascript">
+// Event example
+
+const permissions = new PermissionsAPI()
+
+async function camera() {
+  const asyncCameraHandler = permissions.createAsyncHandler({ name: 'camera' })
+
+  asyncCameraHandler.onPermissionChange((permission) => {
+    console.log('User change permission:', permission.state) // granted or denied
+  })
+
+  const { error, permission } = await asyncCameraHandler.getPermission()
+
+  if (error) {
+    asyncCameraHandler.close()
+    console.error('Async permission error:', error)
+  } else if (permission.state === 'denied') {
+    console.log('Permission:', permission.state)
+  } else {
+    console.log('Permission:', permission.state)
+  }
+}
+      </code>
+</pre>
+  </div>
+
+  <script>hljs.highlightAll();</script>
+  <script type="module" src="index.js"></script>
+  <script>
+    function toggleCodeView($this) {
+      const id = $this.textContent.split('.')[1]
+      const code = document.querySelector(`#${id}`)
+      if (code.style.display === 'none') {
+        code.style.display = 'block'
+      } else {
+        code.style.display = 'none'
+      }
+    }
+  </script>
+</body>
+
+</html>

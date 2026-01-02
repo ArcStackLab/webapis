@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest",
+  "name": "Web APIs Demos - @ArcStackLab",
+  "short_name": "Web APIs Demos",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Web APIs"
+    },
+    {
+      "src": "/arcstack.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "@ArcStackLab"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Web APIs"
+    },
+    {
+      "src": "/arcstack.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "@ArcStackLab"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "./?source=PWA",
+  "id": "@arcstack/webapis",
+  "shortcuts": [
+    {
+      "name": "Web APIs Demos",
+      "short_name": "WebAPIs Demos",
+      "url": "./?source=PWA",
+      "description": "A Comprehensive Integration of All Web Standard APIs",
+      "icons": [
+        {
+          "src": "/android-chrome-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+api",
+      "url": "./?source=PWA&ref=%s"
+    }
+  ]
+}

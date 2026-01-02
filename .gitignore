@@ -91,6 +91,10 @@ out
 .nuxt
 dist
 
+# Documentations / Demos
+demos/out
+demos/packages.json
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js
@@ -163,5 +167,8 @@ testem.log
 tmp
 /out-tsc
 
+.nx
 .nx/cache
 .nx/workspace-data
+.cursor
+Icon

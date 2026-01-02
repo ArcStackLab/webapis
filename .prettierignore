@@ -2,3 +2,7 @@
 .pnpm-store
 .nx
 pnpm-*.yaml
+dist
+*.html
+*.json
+.prettierrc

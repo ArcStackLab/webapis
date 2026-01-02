@@ -1,0 +1,57 @@
+@import "./theme.css";
+@import "tailwindcss";
+
+@theme {
+  /** Theme primary colors */
+  --color-primary: var(--primary-0);
+  --color-primary-500: var(--primary-0);
+  --color-primary-600: var(--primary-10);
+  --color-primary-700: var(--primary-20);
+  --color-primary-800: var(--primary-30);
+  --color-primary-900: var(--primary-40);
+  --color-primary-950: var(--primary-50);
+
+  /** Theme surface colors */
+  --color-surface: var(--surface-0);
+  --color-surface-500: var(--surface-0);
+  --color-surface-600: var(--surface-10);
+  --color-surface-700: var(--surface-20);
+  --color-surface-800: var(--surface-30);
+  --color-surface-900: var(--surface-40);
+  --color-surface-950: var(--surface-50);
+
+  /** Success colors */
+  --color-success: var(--success-0);
+  --color-success-500: var(--success-0);
+  --color-success-600: var(--success-10);
+  --color-success-700: var(--success-20);
+
+  /** Warning colors */
+  --color-warning: var(--warning-0);
+  --color-warning-500: var(--warning-0);
+  --color-warning-600: var(--warning-10);
+  --color-warning-700: var(--warning-20);
+
+  /** Danger colors */
+  --color-danger: var(--danger-0);
+  --color-danger-500: var(--danger-0);
+  --color-danger-600: var(--danger-10);
+  --color-danger-700: var(--danger-20);
+
+  /** Info colors */
+  --color-info: var(--info-0);
+  --color-info-500: var(--info-0);
+  --color-info-600: var(--info-10);
+  --color-info-700: var(--info-20);
+}
+
+@layer base {
+
+  html,
+  body {
+    color: var(--color-primary-950);
+    background-color: var(--color-surface);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+  }
+}
