@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "compile:demos": "cd .. && pnpm demos",
+    "compile:demos": "pwd && cd .. && pwd && pnpm demos",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pwd && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
