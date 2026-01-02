@@ -12,7 +12,7 @@
     "build": "nx run-many --target=build",
     "predist": "rm -rf dist",
     "dist": "gulp dist",
-    "predemos": "rm -rf demos/out",
+    "predemos": "rm -rf demos/public/out",
     "demos": "gulp demos",
     "lint": "eslint **/* && tsc",
     "clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -not -path '*/.nx/*'",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.11.0",
+    "@eslint/js": "^9.39.2",
     "@nx/eslint": "19.8.0",
     "@nx/eslint-plugin": "^19.8.0",
     "esbuild": "^0.23.1",

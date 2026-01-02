@@ -6,7 +6,8 @@
       "dependsOn": [
         "^build",
         "minify",
-        "lint"
+        "lint",
+        "compile:demos"
       ],
       "outputs": [
         "{projectRoot}/dist"
@@ -22,6 +23,17 @@
         "{projectRoot}/dist"
       ],
       "cache": true
+    },
+    "dev": {
+      "dependsOn": [
+        "compile:demos"
+      ]
+    },
+    "compile:demos": {
+      "cache": true,
+      "outputs": [
+        "{projectRoot}/public/out"
+      ]
     }
   },
   "plugins": [
