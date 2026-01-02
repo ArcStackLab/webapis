@@ -2,16 +2,38 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",
   "targetDefaults": {
+    "dist": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true,
+      "parallelism": false
+    },
+    "demos": {
+      "dependsOn": [
+        "dist"
+      ],
+      "parallelism": false,
+      "cache": true,
+      "outputs": [
+        "{projectRoot}demos/public/out",
+        "{projectRoot}demos/packages.json"
+      ]
+    },
     "build": {
       "dependsOn": [
         "^build",
         "minify",
         "lint"
       ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
-      "cache": true
+      "parallelism": true
+    },
+    "lint": {
+      "parallelism": true,
+      "cache": false
     },
     "minify": {
       "dependsOn": [
@@ -21,7 +43,8 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
-      "cache": true
+      "cache": true,
+      "parallelism": true
     }
   },
   "plugins": [

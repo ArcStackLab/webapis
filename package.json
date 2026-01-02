@@ -9,16 +9,17 @@
   },
   "description": "A Comprehensive Integration of All Web Standard APIs",
   "scripts": {
-    "build": "nx run-many --target=build",
+    "build": "nx run-many --target=build --exclude=@arcstack/webapis --exclude=@arcstack/demos",
     "predist": "rm -rf dist",
     "dist": "gulp dist",
-    "predemos": "rm -rf demos/out",
+    "predemos": "rm -rf demos/public/out",
     "demos": "gulp demos",
-    "lint": "eslint **/* && tsc",
+    "build:all": "nx demos @arcstack/webapis && nx build @arcstack/demos",
     "clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -not -path '*/.nx/*'",
     "unsafe-clean": "find . -type d -name 'dist' -not -path '*/node_modules/*' -not -path '*/.nx/*' -exec rm -rf {} +",
     "uninstall-husky": "pnpm uninstall husky --no-save && git config --unset core.hooksPath && pnpm dlx rimraf .husky"
   },
+  "nx": {},
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -33,25 +34,25 @@
     "permissions": "./dist/permissions.js"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.11.0",
-    "@nx/eslint": "19.8.0",
-    "@nx/eslint-plugin": "^19.8.0",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.2",
+    "@nx/eslint": "22.3.3",
+    "@nx/eslint-plugin": "^22.3.3",
     "esbuild": "^0.23.1",
-    "eslint": "^9.9.1",
+    "eslint": "^9.39.2",
     "globals": "^15.9.0",
     "gulp": "^5.0.0",
     "gulp-cli": "^3.0.0",
     "gulp-flatten": "^0.4.0",
     "husky": "^9.1.5",
     "lint-staged": "^15.2.10",
-    "netlify-cli": "^21.4.2",
-    "nx": "19.8.0",
+    "netlify-cli": "^23.13.0",
+    "nx": "22.3.3",
     "prettier": "^3.3.3",
     "tslib": "^2.7.0",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.4.0"
+    "typescript-eslint": "^8.51.0"
   },
   "keywords": [
     "web",

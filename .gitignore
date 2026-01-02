@@ -93,6 +93,7 @@ dist
 
 # Documentations / Demos
 demos/out
+demos/packages.json
 
 # Gatsby files
 .cache/
@@ -170,3 +171,4 @@ tmp
 .nx/cache
 .nx/workspace-data
 .cursor
+Icon

@@ -1,0 +1,116 @@
+:root,
+:root.light {
+  /** Theme primary colors */
+  --primary-0: #313131;
+  --primary-10: #2c2c2c;
+  --primary-20: #272727;
+  --primary-30: #232323;
+  --primary-40: #1e1e1e;
+  --primary-50: #1a1a1a;
+
+  /** Theme surface colors */
+  --surface-0: #ffffff;
+  --surface-10: #f0f0f0;
+  --surface-20: #e1e1e1;
+  --surface-30: #d3d3d3;
+  --surface-40: #c5c5c5;
+  --surface-50: #b6b6b6;
+
+  /** Success colors */
+  --success-0: #1b7f5c;
+  --success-10: #28be8a;
+  --success-20: #58dbad;
+
+  /** Warning colors */
+  --warning-0: #b8871f;
+  --warning-10: #dfae44;
+  --warning-20: #ebca85;
+
+  /** Danger colors */
+  --danger-0: #b13535;
+  --danger-10: #d06262;
+  --danger-20: #e29d9d;
+
+  /** Info colors */
+  --info-0: #1e56a3;
+  --info-10: #347ada;
+  --info-20: #74a4e6;
+}
+
+:root.dark {
+  /** Theme primary colors */
+  --primary-0: #ffffff;
+  --primary-10: #ffffff;
+  --primary-20: #ffffff;
+  --primary-30: #ffffff;
+  --primary-40: #ffffff;
+  --primary-50: #ffffff;
+
+  /** Theme surface colors */
+  --surface-0: #212121;
+  --surface-10: #363636;
+  --surface-20: #4c4c4c;
+  --surface-30: #636363;
+  --surface-40: #7b7b7b;
+  --surface-50: #949494;
+
+  /** Success colors */
+  --success-0: #22946e;
+  --success-10: #47d5a6;
+  --success-20: #9ae8ce;
+
+  /** Warning colors */
+  --warning-0: #a87a2a;
+  --warning-10: #d7ac61;
+  --warning-20: #ecd7b2;
+
+  /** Danger colors */
+  --danger-0: #9c2121;
+  --danger-10: #d94a4a;
+  --danger-20: #eb9e9e;
+
+  /** Info colors */
+  --info-0: #21498a;
+  --info-10: #4077d1;
+  --info-20: #92b2e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /** Theme primary colors */
+    --primary-0: #ffffff;
+    --primary-10: #ffffff;
+    --primary-20: #ffffff;
+    --primary-30: #ffffff;
+    --primary-40: #ffffff;
+    --primary-50: #ffffff;
+
+    /** Theme surface colors */
+    --surface-0: #212121;
+    --surface-10: #363636;
+    --surface-20: #4c4c4c;
+    --surface-30: #636363;
+    --surface-40: #7b7b7b;
+    --surface-50: #949494;
+
+    /** Success colors */
+    --success-0: #22946e;
+    --success-10: #47d5a6;
+    --success-20: #9ae8ce;
+
+    /** Warning colors */
+    --warning-0: #a87a2a;
+    --warning-10: #d7ac61;
+    --warning-20: #ecd7b2;
+
+    /** Danger colors */
+    --danger-0: #9c2121;
+    --danger-10: #d94a4a;
+    --danger-20: #eb9e9e;
+
+    /** Info colors */
+    --info-0: #21498a;
+    --info-10: #4077d1;
+    --info-20: #92b2e5;
+  }
+}

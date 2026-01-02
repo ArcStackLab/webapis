@@ -40,13 +40,15 @@ export function demos(cb) {
   gulp
     .src(['packages/(**)/demo/(**)'])
     .pipe(flatten({ includeParents: 1 }))
-    .pipe(gulp.dest('demos/out/'))
+    .pipe(gulp.dest('demos/public/out/'))
 
-  gulp.src(['dist/(**).min.js']).pipe(gulp.dest('demos/out/dist/'))
+  gulp.src(['dist/(**).min.js']).pipe(gulp.dest('demos/public/out/dist/'))
 
   const packagesDir = path.join(import.meta.dirname, './packages')
-  const outputFile = path.join(import.meta.dirname, './demos/out/packages.json')
-  const data = scanPackages(packagesDir)
+  const outputFile = path.join(import.meta.dirname, './demos/packages.json')
+  const data = scanPackages(packagesDir).sort((a, b) =>
+    a.name.localCompare(b.name)
+  )
 
   fs.mkdirSync(path.dirname(outputFile), { recursive: true })
   fs.writeFileSync(outputFile, JSON.stringify(data, null, 2))

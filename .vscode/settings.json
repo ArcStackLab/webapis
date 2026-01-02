@@ -19,6 +19,7 @@
   "cSpell.words": [
     "arcstack",
     "factman",
+    "webapi",
     "webapis"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
