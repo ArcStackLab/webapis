@@ -9,15 +9,31 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
-      "cache": true
+      "cache": true,
+      "parallelism": false
+    },
+    "demos": {
+      "dependsOn": [
+        "dist"
+      ],
+      "parallelism": false,
+      "cache": true,
+      "outputs": [
+        "{projectRoot}demos/public/out",
+        "{projectRoot}demos/packages.json"
+      ]
     },
     "build": {
       "dependsOn": [
         "^build",
         "minify",
-        "lint",
-        "compile:demos"
-      ]
+        "lint"
+      ],
+      "parallelism": true
+    },
+    "lint": {
+      "parallelism": true,
+      "cache": false
     },
     "minify": {
       "dependsOn": [
@@ -27,18 +43,8 @@
       "outputs": [
         "{projectRoot}/dist"
       ],
-      "cache": true
-    },
-    "dev": {
-      "dependsOn": [
-        "compile:demos"
-      ]
-    },
-    "compile:demos": {
       "cache": true,
-      "outputs": [
-        "{projectRoot}/public/out"
-      ]
+      "parallelism": true
     }
   },
   "plugins": [
